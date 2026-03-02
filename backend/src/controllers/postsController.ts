@@ -32,8 +32,8 @@ export async function getPostsController(req: AuthenticatedRequest, res: Respons
     const filters: GetPostsFilters = {}
     const postType = req.query.post_type as string | undefined
     const status = req.query.status as string | undefined
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
     const offset = (page - 1) * limit
     if (postType && ['lost', 'found', 'adoption'].includes(postType)) {
       filters.post_type = postType as PostType

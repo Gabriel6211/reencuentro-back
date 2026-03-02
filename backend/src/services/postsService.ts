@@ -4,7 +4,9 @@ import { Post, PostRow, PostStatus, PostType } from '../types'
 /** Filters for listing posts (optional) */
 export interface GetPostsFilters {
   post_type?: PostType
-  status?: PostStatus
+  status?: PostStatus,
+  title?: string
+  pet_name?: string
 }
 
 /**
@@ -35,8 +37,14 @@ export async function getPosts(filters?: GetPostsFilters, offset?: number, limit
   if (filters?.status) {
     query = query.eq('status', filters.status)
   }
-  if (offset && limit) {
-    query = query.range(offset, offset + (limit! - 1))
+  if (filters?.title) {
+    query = query.ilike('title', `%${filters.title}%`)
+  }
+  if (filters?.pet_name) {
+    query = query.ilike('pet_name', `%${filters.pet_name}%`)
+  }
+  if (typeof offset === 'number' && typeof limit === 'number') {
+    query = query.range(offset, offset + (limit - 1))
   }
   const { data, error } = await query
   if (error) throw error

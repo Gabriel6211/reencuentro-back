@@ -48,8 +48,8 @@ export const loginUser = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Login successful',
       user: userPayload,
-      access_token: session?.access_token ?? '',
-      refresh_token: session?.refresh_token ?? '',
+      access_token: session?.access_token ?? null,
+      refresh_token: session?.refresh_token ?? null,
     })
   } catch (error: unknown) {
     const err = error as Error
@@ -86,9 +86,8 @@ export const registerUser = async (req: Request, res: Response) => {
       metadata,
     })
 
-    await createProfileService(user.id, metadata || {})
+    const profile = await createProfileService(user.id, metadata || {})
 
-    const profile = await getProfileService(user.id)
     const userPayload = profile
       ? formatUserFromProfile(profile, user.email ?? '')
       : formatUserFromAuth(user)

@@ -5,6 +5,7 @@ const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 const POST_TYPES: PostType[] = ['lost', 'found', 'adoption']
+const STATUS_TYPES: PostStatus[] = ['active', 'found', 'reunited', 'adopted']
 const CREATE_STATUS: PostStatus = 'active'
 const RESOLVED_STATUSES: PostStatus[] = ['found', 'reunited', 'adopted']
 
@@ -238,6 +239,30 @@ export function validateUpdatePost(req: Request, res: Response, next: NextFuncti
     return
   }
   req.body = result.data
+  next()
+}
+
+export function validateGetPosts(req: Request, res: Response, next: NextFunction): void {
+  const postType = req.query.post_type as string | undefined
+  const status = req.query.status as string | undefined
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 10
+  if (postType && !POST_TYPES.includes(postType as PostType)) {
+    res.status(400).json({ error: `Post type must be one of: ${POST_TYPES.join(', ')}` })
+    return
+  }
+  if (status && !STATUS_TYPES.includes(status as PostStatus)) {
+    res.status(400).json({ error: `Status must be one of: active, found, reunited, adopted` })
+    return
+  }
+  if (page < 1) {
+    res.status(400).json({ error: 'Page must be at least 1' })
+    return
+  }
+  if (limit < 1 || limit > 20) {
+    res.status(400).json({ error: 'Limit must be between 1 and 20' })
+    return
+  }
   next()
 }
 

@@ -5,6 +5,7 @@ import { processPostCreateMultipart } from '../middleware/postCreateMultipart'
 import {
   validateCreatePost,
   validatePostId,
+  validateGetPosts,
   validateUpdatePost,
   validateUpdatePostStatus,
 } from '../middleware/posts'
@@ -47,9 +48,14 @@ router.post(
 
 /**
  * GET /api/posts
- * List posts. Query: ?post_type=lost|found|adoption&status=active|found|reunited|adopted
+ * List posts.
+ * Query params:
+ *   - post_type: "lost" | "found" | "adoption"
+ *   - status: "active" | "found" | "reunited" | "adopted"
+ *   - page: page number for pagination (optional, default 1)
+ *   - limit: number of posts per page (optional, e.g. 10, 20)
  */
-router.get('/', getPostsController)
+router.get('/', validateGetPosts, getPostsController)
 
 /**
  * PATCH /api/posts/:id/status
