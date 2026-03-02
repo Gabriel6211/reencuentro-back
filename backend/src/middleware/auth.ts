@@ -9,7 +9,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Middleware to authenticate requests using Supabase JWT token
+ * Middleware to authenticate requests using Supabase JWT token.
  */
 export async function authenticateUser(
   req: AuthenticatedRequest,
@@ -17,7 +17,6 @@ export async function authenticateUser(
   next: NextFunction
 ) {
   try {
-    // Get token from Authorization header
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
@@ -25,7 +24,7 @@ export async function authenticateUser(
       })
     }
 
-    const token = authHeader.substring(7) // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7)
     const user = await verifyUserToken(token)
 
     if (!user) {
@@ -34,7 +33,6 @@ export async function authenticateUser(
       })
     }
 
-    // Attach user to request object
     req.user = {
       id: user.id,
       email: user.email,

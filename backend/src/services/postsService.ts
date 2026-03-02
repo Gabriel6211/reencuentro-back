@@ -4,7 +4,9 @@ import { Post, PostRow, PostStatus, PostType } from '../types'
 /** Filters for listing posts (optional) */
 export interface GetPostsFilters {
   post_type?: PostType
-  status?: PostStatus
+  status?: PostStatus,
+  title?: string
+  pet_name?: string
 }
 
 /**
@@ -26,7 +28,7 @@ export async function createPost(post: Post, userId: string): Promise<PostRow | 
 /**
  * Get posts, optionally filtered by post_type and/or status.
  */
-export async function getPosts(filters?: GetPostsFilters): Promise<PostRow[]> {
+export async function getPosts(filters?: GetPostsFilters, offset?: number, limit?: number): Promise<PostRow[]> {
   const supabase = getSupabaseClient()
   let query = supabase.from('posts').select('*').order('created_at', { ascending: false })
   if (filters?.post_type) {
@@ -34,6 +36,15 @@ export async function getPosts(filters?: GetPostsFilters): Promise<PostRow[]> {
   }
   if (filters?.status) {
     query = query.eq('status', filters.status)
+  }
+  if (filters?.title) {
+    query = query.ilike('title', `%${filters.title}%`)
+  }
+  if (filters?.pet_name) {
+    query = query.ilike('pet_name', `%${filters.pet_name}%`)
+  }
+  if (typeof offset === 'number' && typeof limit === 'number') {
+    query = query.range(offset, offset + (limit - 1))
   }
   const { data, error } = await query
   if (error) throw error

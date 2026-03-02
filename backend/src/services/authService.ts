@@ -1,9 +1,10 @@
 import { getSupabasePublicClient } from '../lib/supabase/client'
+import type { UserProfile } from '../types'
 
 export interface RegisterData {
   email: string
   password: string
-  metadata?: Record<string, any>
+  metadata?: UserProfile
 }
 
 export interface LoginData {
@@ -12,12 +13,12 @@ export interface LoginData {
 }
 
 export interface AuthResponse {
-  user: any
-  session: any
+  user: { id: string; email?: string }
+  session: { access_token: string; refresh_token: string } | null
 }
 
 /**
- * Register a new user
+ * Register a new user (auth only). Caller should create profile via profileService.createProfile.
  */
 export async function registerUser(data: RegisterData): Promise<AuthResponse> {
   const supabase = getSupabasePublicClient()
@@ -27,19 +28,13 @@ export async function registerUser(data: RegisterData): Promise<AuthResponse> {
     password: data.password,
     options: {
       data: data.metadata || {},
-      emailRedirectTo: undefined, // Optional: set redirect URL for email confirmation
+      emailRedirectTo: undefined,
     },
   })
 
-  if (error) {
-    throw new Error(error.message)
-  }
+  if (error) throw new Error(error.message)
+  if (!authData.user) throw new Error('Failed to create user')
 
-  if (!authData.user) {
-    throw new Error('Failed to create user')
-  }
-
-  // Note: session might be null if email confirmation is required
   return {
     user: authData.user,
     session: authData.session,
@@ -47,7 +42,7 @@ export async function registerUser(data: RegisterData): Promise<AuthResponse> {
 }
 
 /**
- * Login a user
+ * Login a user.
  */
 export async function loginUser(data: LoginData): Promise<AuthResponse> {
   const supabase = getSupabasePublicClient()
@@ -57,10 +52,7 @@ export async function loginUser(data: LoginData): Promise<AuthResponse> {
     password: data.password,
   })
 
-  if (error) {
-    throw new Error(error.message)
-  }
-
+  if (error) throw new Error(error.message)
   if (!authData.user || !authData.session) {
     throw new Error('Invalid credentials or user not found')
   }
