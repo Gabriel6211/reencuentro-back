@@ -26,7 +26,7 @@ export async function createPost(post: Post, userId: string): Promise<PostRow | 
 /**
  * Get posts, optionally filtered by post_type and/or status.
  */
-export async function getPosts(filters?: GetPostsFilters): Promise<PostRow[]> {
+export async function getPosts(filters?: GetPostsFilters, offset?: number, limit?: number): Promise<PostRow[]> {
   const supabase = getSupabaseClient()
   let query = supabase.from('posts').select('*').order('created_at', { ascending: false })
   if (filters?.post_type) {
@@ -34,6 +34,9 @@ export async function getPosts(filters?: GetPostsFilters): Promise<PostRow[]> {
   }
   if (filters?.status) {
     query = query.eq('status', filters.status)
+  }
+  if (offset && limit) {
+    query = query.range(offset, offset + (limit! - 1))
   }
   const { data, error } = await query
   if (error) throw error

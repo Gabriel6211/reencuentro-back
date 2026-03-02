@@ -49,7 +49,7 @@ router.post(
  * GET /api/posts
  * List posts. Query: ?post_type=lost|found|adoption&status=active|found|reunited|adopted
  */
-router.get('/', authenticateUser, getPostsController)
+router.get('/', getPostsController)
 
 /**
  * PATCH /api/posts/:id/status
@@ -74,7 +74,7 @@ router.patch('/:id', authenticateUser, validatePostId, validateUpdatePost, updat
  * GET /api/posts/:id
  * Get post by id
  */
-router.get('/:id', authenticateUser, validatePostId, getPostByIdController)
+router.get('/:id', validatePostId, getPostByIdController)
 
 /**
  * DELETE /api/posts/:id

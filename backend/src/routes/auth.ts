@@ -1,20 +1,18 @@
-import express from "express";
-import { loginUser, registerUser } from "../controllers/authController";
+import express from 'express'
+import { loginUser, registerUser } from '../controllers/authController'
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * POST /api/auth/register
- * Register a new user
- * Public endpoint - no authentication required
+ * Register a new user (creates auth user + profile row).
  */
-router.post("/register", registerUser);
+router.post('/register', registerUser)
 
 /**
  * POST /api/auth/login
- * Login a user
- * Public endpoint - no authentication required
+ * Login and return user (with profile from DB) and tokens.
  */
-router.post("/login", loginUser);
+router.post('/login', loginUser)
 
-export default router;
+export default router
